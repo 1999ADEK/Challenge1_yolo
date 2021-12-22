@@ -7,9 +7,9 @@ import numpy as np
 import cv2
 
 
-def gen_img(split, data, reweight=0):
+def gen_img(split, data, reweight=1):
     if split == "val":
-        reweight = 0
+        reweight = 1
     for key, instance in tqdm(data.items()):
         load_path = instance["path"]
 
@@ -43,7 +43,7 @@ def gen_img(split, data, reweight=0):
                 f.write(f"0 {coord[0]/w} {coord[1]/h} {64/w} {64/h}\n")
 
             # reweight positive samples
-            if instance["label"] == 1 and reweight > 0:
+            if instance["label"] == 1:
                 for i in range(reweight-1):
                     os.symlink(image_path, image_path[:-4] + f"_cp{i}.png")
                     os.symlink(label_path, label_path[:-4] + f"_cp{i}.txt")
@@ -52,7 +52,7 @@ if __name__ == '__main__':
     try:
         reweight = int(sys.argv[1])
     except:
-        reweight = 0
+        reweight = 1
 
     for split in ["train", "val"]:
         data = json.load(open(f"records_{split}.json", "r"))
